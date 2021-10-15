@@ -1,6 +1,11 @@
 import React from 'react';
+import { withRouter, Redirect } from 'react-router-dom';
 
 import MuseumBadgeOps from "./MuseumBadgeOps";
+
+import {
+  useParams
+} from "react-router-dom";
 
 import './App.css';
 
@@ -12,7 +17,8 @@ class QuestionScreen extends React.Component {
       'visitedMuseums': {
       },
       'visitedArtworks': {
-      }
+      },
+      'userId': "",
     };
   }
 
@@ -34,7 +40,7 @@ class QuestionScreen extends React.Component {
         imgUrl: "https://media.timeout.com/images/102850781/image.jpg",
       },
     ];
-    // const museums = ['SFMOMA', 'MoMA', 'The Art Institute of Chicago'];
+
     return museums.map((museum, i) => {
       var name = museum['key'];
       var city = museum['city'];
@@ -107,6 +113,7 @@ class QuestionScreen extends React.Component {
     })
   }
 
+  // On click of museum checkbox, update state
   onVisitedMuseumChange(e) {
     const val = e.target.checked;
     const name = e.target.name;
@@ -116,6 +123,7 @@ class QuestionScreen extends React.Component {
     });
   }
 
+  // On click of artwork checkbox, update state
   onVisitedArtworkChange(e) {
     const val = e.target.checked;
     const name = e.target.name;
@@ -125,11 +133,19 @@ class QuestionScreen extends React.Component {
     });
   }
 
-  onFormSubmit(e) {
+  // When form is submitted, add to db and go to profile
+  async onFormSubmit(e) {
     e.preventDefault();
     console.log('visited museums', this.state.visitedMuseums);
     console.log('visited artworks', this.state.visitedArtworks);
-    this.museumBadgeOps.markVisited(this.state.visitedMuseums, this.state.visitedArtworks);
+    const userId = await this.museumBadgeOps.signIn();
+    this.setState({'userId': userId});
+
+    this.museumBadgeOps.markVisited(userId, this.state.visitedMuseums, this.state.visitedArtworks);
+    this.props.history.push({
+      pathname: '/profile/' + userId,
+      state: { userId: userId }
+    });
   }
 
   render() {
@@ -153,4 +169,4 @@ class QuestionScreen extends React.Component {
   }
 }
 
-export default QuestionScreen;
+export default withRouter(QuestionScreen);

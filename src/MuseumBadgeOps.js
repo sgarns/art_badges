@@ -23,30 +23,59 @@ var userId = "";
 class MuseumBadgeOps extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      userId: "",
+    }
   }
 
-
-  async markVisited(museumsVisited, artworksVisited) {
+  async signIn() {
     const auth = getAuth();
-    var today = new Date();
-    signInAnonymously(auth).then(() => {
+    return signInAnonymously(auth).then(() => {
       userId = auth.currentUser.uid;
-      addDoc(collection(db, "museumsVisited"), {
-        timestamp: today,
-        uid: userId,
-        museumsVisited: museumsVisited
-      });
-      addDoc(collection(db, "artworksVisited"), {
-        timestamp: today,
-        uid: userId,
-        artworksVisited: artworksVisited
-      });
-    })
-    .catch((error) => {
+      this.setState({ userId: userId });
+      return userId;
+    }).catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(`error logging in: ${errorMessage}`);
     });
+  }
+
+
+  async markVisited(userId, museumsVisited, artworksVisited) {
+    var today = new Date();
+    setDoc(doc(db, "museumsVisited", userId), {
+      timestamp: today,
+      uid: userId,
+      museumsVisited: museumsVisited
+    });
+    setDoc(doc(db, "artworksVisited", userId), {
+      timestamp: today,
+      uid: userId,
+      artworksVisited: artworksVisited
+    });
+  }
+
+  async getMuseumsVisited(userId) {
+    const q = query(collection(db, "museumsVisited"), where("uid", "==", userId));
+
+    const querySnapshot = await getDocs(q);
+    var museumsVisited = [];
+    querySnapshot.forEach((doc) => {
+      museumsVisited = Object.keys(doc.data().museumsVisited);
+    });
+    return museumsVisited;
+  }
+
+  async getArtworksVisited(userId) {
+    const q = query(collection(db, "artworksVisited"), where("uid", "==", userId));
+
+    const querySnapshot = await getDocs(q);
+    var artworksVisited = [];
+    querySnapshot.forEach((doc) => {
+      artworksVisited = Object.keys(doc.data().artworksVisited);
+    });
+    return artworksVisited;
   }
 
 }

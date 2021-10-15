@@ -1,11 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
-// import Navbar from "react-bootstrap/Navbar";
-// import Nav from "react-bootstrap/Nav";
+// import Navbar from 'react-bootstrap/Navbar';
 
 import App from "./App";
-
+import ProfileScreen from "./ProfileScreen";
 import QuestionScreen from "./QuestionScreen";
 
 class AppRouter extends React.Component {
@@ -24,9 +22,8 @@ class AppRouter extends React.Component {
     return (
       <Router>
         <Switch>
-          <Route path="/">
-            <QuestionScreen />
-          </Route>
+          <Route path="/" exact component={QuestionScreen} />
+          <Route path="/profile/:id" component={ProfileScreen} />
         </Switch>
       </Router>
     );
