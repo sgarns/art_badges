@@ -14,35 +14,26 @@ class QuestionScreen extends React.Component {
     super(props);
     this.museumBadgeOps = new MuseumBadgeOps();
     this.state = {
-      'visitedMuseums': {
-      },
-      'visitedArtworks': {
-      },
-      'userId': "",
+      visitedMuseums: {},
+      visitedArtworks: {},
+      allMuseums: [],
+      allArtworks: [],
+      userId: "",
     };
   }
 
-  renderVisitedMuseums() {
-    var museums = [
-      {
-        key: "SFMOMA",
-        city: "San Francisco, CA",
-        imgUrl: "https://www.sftravel.com/sites/sftravel.prod.acquia-sites.com/files/field/image/SFMOMA-Header.jpg",
-      },
-      {
-        key: "MoMA",
-        city: "New York, NY",
-        imgUrl: "https://www.moma.org/assets/visit/entrance-image--museum-crop-7516b01003659172f2d9dbc7a6c2e9d9.jpg",
-      },
-      {
-        key: "The Art Institute of Chicago",
-        city: "Chicago, IL",
-        imgUrl: "https://media.timeout.com/images/102850781/image.jpg",
-      },
-    ];
+  async componentDidMount() {
+    const artworks = await this.museumBadgeOps.getAllArtworks();
+    const museums = await this.museumBadgeOps.getAllMuseums();
+    this.setState({
+      allArtworks: artworks,
+      allMuseums: museums,
+    });
+  }
 
-    return museums.map((museum, i) => {
-      var name = museum['key'];
+  renderVisitedMuseums() {
+    return this.state.allMuseums.map((museum, i) => {
+      var name = museum['name'];
       var city = museum['city'];
       var imgUrl = museum['imgUrl'];
       return (
@@ -69,25 +60,8 @@ class QuestionScreen extends React.Component {
   }
 
   renderVisitedArtworks() {
-    var artworks = [
-      {
-        key: "American Gothic",
-        museum: "The Art Institute of Chicago",
-        imgUrl: "https://www.artic.edu/iiif/2/b272df73-a965-ac37-4172-be4e99483637/full/843,/0/default.jpg",
-      },
-      {
-        key: "Mona Lisa",
-        museum: "Louvre",
-        imgUrl: "https://s.abcnews.com/images/International/mona_lisa_file_getty_190717_hpMain_20190717-061249_4x5_992.jpg",
-      },
-      {
-        key: "Christina's World",
-        museum: "MoMA",
-        imgUrl: "https://www.moma.org/media/W1siZiIsIjE2NTQ1NyJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA5MCAtcmVzaXplIDIwMDB4MTQ0MFx1MDAzZSJdXQ.jpg?sha=87dcd730f5d306a4",
-      },
-    ];
-    return artworks.map((artwork, i) => {
-      var name = artwork['key'];
+    return this.state.allArtworks.map((artwork, i) => {
+      var name = artwork['name'];
       var museum = artwork['museum'];
       var imgUrl = artwork['imgUrl'];
       return (
@@ -149,6 +123,8 @@ class QuestionScreen extends React.Component {
   }
 
   render() {
+    this.museumBadgeOps.addArtworkstoDb();
+    this.museumBadgeOps.addMuseumstoDb();
     return (
       <div className="App">
           <div className="Museum-container">
