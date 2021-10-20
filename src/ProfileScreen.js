@@ -65,24 +65,6 @@ class ProfileScreen extends React.Component {
   }
 
   renderVisitedMuseums() {
-    // var museums = {
-    //   "SFMOMA": {
-    //     key: "SFMOMA",
-    //     city: "San Francisco, CA",
-    //     imgUrl: "https://www.sftravel.com/sites/sftravel.prod.acquia-sites.com/files/field/image/SFMOMA-Header.jpg",
-    //   },
-    //   "MoMA": {
-    //     key: "MoMA",
-    //     city: "New York, NY",
-    //     imgUrl: "https://www.moma.org/assets/visit/entrance-image--museum-crop-7516b01003659172f2d9dbc7a6c2e9d9.jpg",
-    //   },
-    //   "The Art Institute of Chicago": {
-    //     key: "The Art Institute of Chicago",
-    //     city: "Chicago, IL",
-    //     imgUrl: "https://media.timeout.com/images/102850781/image.jpg",
-    //   },
-    // };
-
     if (Object.keys(this.state.allMuseums).length === 0) {
       return ( <div /> );
     }
@@ -107,11 +89,12 @@ class ProfileScreen extends React.Component {
   render() {
     return (
       <div className="App">
-        <h2>Museums you've visited</h2>
+        <h1>{this.props.location.state.name}'s Collection</h1>
+        <h3>Museums you've visited</h3>
         <div className="Art-checkbox-container">
           { this.renderVisitedMuseums() }
         </div>
-        <h2>Artworks you've seen</h2>
+        <h3>Artworks you've seen</h3>
         <div className="Art-checkbox-container">
           { this.renderVisitedArtworks() }
         </div>

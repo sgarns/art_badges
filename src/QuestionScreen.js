@@ -19,6 +19,7 @@ class QuestionScreen extends React.Component {
       allMuseums: [],
       allArtworks: [],
       userId: "",
+      name: "",
     };
   }
 
@@ -93,7 +94,7 @@ class QuestionScreen extends React.Component {
     const name = e.target.name;
     let updatedVisitedMuseums = Object.assign({}, this.state.visitedMuseums, {[name]: val});
     this.setState({
-      'visitedMuseums': updatedVisitedMuseums
+      visitedMuseums: updatedVisitedMuseums,
     });
   }
 
@@ -103,7 +104,16 @@ class QuestionScreen extends React.Component {
     const name = e.target.name;
     let updatedVisitedArtworks = Object.assign({}, this.state.visitedArtworks, {[name]: val});
     this.setState({
-      'visitedArtworks': updatedVisitedArtworks
+      visitedArtworks: updatedVisitedArtworks,
+    });
+  }
+
+  onNameChange(e) {
+    const val = e.target.value;
+    console.log("name input");
+    console.log(val);
+    this.setState({
+      name: val,
     });
   }
 
@@ -113,12 +123,15 @@ class QuestionScreen extends React.Component {
     console.log('visited museums', this.state.visitedMuseums);
     console.log('visited artworks', this.state.visitedArtworks);
     const userId = await this.museumBadgeOps.signIn();
-    this.setState({'userId': userId});
+    this.setState({ userId: userId });
 
     this.museumBadgeOps.markVisited(userId, this.state.visitedMuseums, this.state.visitedArtworks);
     this.props.history.push({
       pathname: '/profile/' + userId,
-      state: { userId: userId }
+      state: {
+        userId: userId,
+        name: this.state.name,
+      }
     });
   }
 
@@ -129,6 +142,13 @@ class QuestionScreen extends React.Component {
       <div className="App">
           <div className="Museum-container">
             <form onSubmit={this.onFormSubmit.bind(this)}>
+              <h3>What's your name?</h3>
+              <input
+                type="text"
+                id="name"
+                onChange={this.onNameChange.bind(this)}
+                value={this.state.name}
+              />
               <h3>Which museums have you visited?</h3>
               <div className="Art-checkbox-container">
                 { this.renderVisitedMuseums() }
