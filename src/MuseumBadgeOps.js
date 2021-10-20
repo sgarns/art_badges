@@ -1,7 +1,7 @@
 import React from "react";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
 // Your web app's Firebase configuration
@@ -47,13 +47,34 @@ class MuseumBadgeOps extends React.Component {
     setDoc(doc(db, "museumsVisited", userId), {
       timestamp: today,
       uid: userId,
-      museumsVisited: museumsVisited
+      museumsVisited: museumsVisited,
+      favorites: [],
     });
     setDoc(doc(db, "artworksVisited", userId), {
       timestamp: today,
       uid: userId,
-      artworksVisited: artworksVisited
+      artworksVisited: artworksVisited,
+      favorites: [],
     });
+  }
+
+  async markFavorite(userId, name, isFavorite, isMuseum) {
+    var currDoc = {};
+    if (isMuseum) {
+      currDoc = doc(db, "museumsVisited", userId);
+    } else {
+      currDoc = doc(db, "artworksVisited", userId);
+    }
+
+    if (isFavorite) {
+      updateDoc(currDoc, {
+        favorites: arrayUnion(name)
+      });
+    } else {
+      updateDoc(currDoc, {
+        favorites: arrayRemove(name)
+      });
+    }
   }
 
   async getAllArtworks() {
@@ -83,10 +104,14 @@ class MuseumBadgeOps extends React.Component {
 
     const querySnapshot = await getDocs(q);
     var museumsVisited = [];
+    var favorites = {};
     querySnapshot.forEach((doc) => {
       museumsVisited = Object.keys(doc.data().museumsVisited);
+      for (let name of doc.data()['favorites']) {
+        favorites[name] = {}
+      }
     });
-    return museumsVisited;
+    return [museumsVisited, favorites];
   }
 
   async getArtworksVisited(userId) {
@@ -94,10 +119,15 @@ class MuseumBadgeOps extends React.Component {
 
     const querySnapshot = await getDocs(q);
     var artworksVisited = [];
+    var favorites = {};
     querySnapshot.forEach((doc) => {
       artworksVisited = Object.keys(doc.data().artworksVisited);
+      for (let name of doc.data()['favorites']) {
+        favorites[name] = {}
+      }
     });
-    return artworksVisited;
+    console.log(favorites);
+    return [artworksVisited, favorites];
   }
 
   async addArtworkstoDb(artworks) {
