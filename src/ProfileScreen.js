@@ -13,7 +13,9 @@ class ProfileScreen extends React.Component {
       artworksVisited: [],
       allArtworks: {},
       allMuseums: {},
-      favorites: {},
+      artworkFavorites: {},
+      museumFavorites: {},
+      name: "",
     }
   }
 
@@ -43,29 +45,93 @@ class ProfileScreen extends React.Component {
     const artworksVisitedList = artworksVisitedRes[0];
     const artworkFavorites = artworksVisitedRes[1];
 
-    const allFavorites = Object.assign({}, museumFavorites, artworkFavorites);
+    var name = ""
+    if (this.props.location.state != null) {
+      name = this.props.location.state.name;
+    } else {
+      name = await this.museumBadgeOps.getUserInfo();
+      console.log(name);
+    }
 
     this.setState({
       allArtworks: artworksObj,
       allMuseums: museumsObj,
       artworksVisited: artworksVisitedList,
       museumsVisited: museumsVisitedList,
-      favorites: allFavorites,
+      museumFavorites: museumFavorites,
+      artworkFavorites: artworkFavorites,
+      name: name,
     });
   }
 
-  clickFavorite(name, isMuseum) {
+  clickFavorite(name, imgUrl, subtitle, isMuseum) {
     const userId = this.props.match.params.id;
     var isFavorite = false;
+    const allFavorites = Object.assign({}, this.state.museumFavorites, this.state.artworkFavorites);
 
-    if (name in this.state.favorites) {
-      delete this.state.favorites[name];
+    if (name in allFavorites) {
+      delete this.state.museumFavorites[name];
+      delete this.state.artworkFavorites[name];
     } else {
-      this.state.favorites[name] = {};
+      if (isMuseum === true) {
+        this.state.museumFavorites[name] = {
+          imgUrl: imgUrl,
+          subtitle: subtitle,
+        };
+      } else {
+        this.state.artworkFavorites[name] = {
+          imgUrl: imgUrl,
+          subtitle: subtitle,
+        };
+      }
       isFavorite = true;
     }
     this.museumBadgeOps.markFavorite(userId, name, isFavorite, isMuseum);
     this.forceUpdate();
+  }
+
+  renderFavoriteArtworks() {
+    if (Object.keys(this.state.artworkFavorites).length === 0 || Object.keys(this.state.allArtworks).length === 0) {
+      return ( <div /> );
+    }
+
+    return Object.keys(this.state.artworkFavorites).map((name) => {
+      var imgUrl = this.state.allArtworks[name]["imgUrl"];
+      var artist = this.state.allArtworks[name]["artist"];
+      return (
+        <div key={name} className="Art-checkbox">
+          <div className="Art-icon">
+              <img className="Art-icon-photo" src={imgUrl} alt={name} />
+              <div className="Art-details">
+                <b>{name}</b>
+                {artist}
+              </div>
+          </div>
+        </div>
+      )
+    });
+  }
+
+  renderFavoriteMuseums() {
+    if (Object.keys(this.state.museumFavorites).length === 0 || Object.keys(this.state.allMuseums).length === 0) {
+      return ( <div /> );
+    }
+
+    return Object.keys(this.state.museumFavorites).map((name) => {
+      var imgUrl = this.state.allMuseums[name]["imgUrl"];
+      var artist = this.state.allMuseums[name]["artist"];
+      return (
+        <div key={name} className="Art-checkbox">
+          <div className="Art-icon">
+              <img className="Art-icon-photo" src={imgUrl} alt={name} />
+              <div className="Art-details">
+                <b>{name}</b>
+                {artist}
+              </div>
+          </div>
+        </div>
+      )
+    });
   }
 
   renderVisitedArtworks() {
@@ -78,9 +144,9 @@ class ProfileScreen extends React.Component {
       var museum = this.state.allArtworks[name]["museum"];
       return (
         <div key={name} className="Art-checkbox">
-          {name in this.state.favorites ?
-            <BsBookmarkHeartFill onClick={() => this.clickFavorite(name, false)} className="icon" size="25" /> :
-            <BsBookmarkHeart onClick={() => this.clickFavorite(name, false)} className="icon" size="25" />
+          {name in this.state.artworkFavorites ?
+            <BsBookmarkHeartFill onClick={() => this.clickFavorite(name, imgUrl, museum, false)} className="icon" size="25" /> :
+            <BsBookmarkHeart onClick={() => this.clickFavorite(name, imgUrl, museum, false)} className="icon" size="25" />
           }
           <div className="Art-icon">
               <img className="Art-icon-photo" src={imgUrl} alt={name} />
@@ -104,9 +170,9 @@ class ProfileScreen extends React.Component {
       var city = this.state.allMuseums[name]["city"];
       return (
         <div key={name} className="Art-checkbox">
-          {name in this.state.favorites ?
-            <BsBookmarkHeartFill onClick={() => this.clickFavorite(name, true)} className="icon" size="25" /> :
-            <BsBookmarkHeart onClick={() => this.clickFavorite(name, true)} className="icon" size="25" />
+          {name in this.state.museumFavorites ?
+            <BsBookmarkHeartFill onClick={() => this.clickFavorite(name, imgUrl, city, true)} className="icon" size="25" /> :
+            <BsBookmarkHeart onClick={() => this.clickFavorite(name, imgUrl, city, true)} className="icon" size="25" />
           }
           <div className="Art-icon">
               <img className="Art-icon-photo" src={imgUrl} alt={name} />
@@ -121,14 +187,21 @@ class ProfileScreen extends React.Component {
   }
 
   render() {
+    console.log(this.state.name);
+
     return (
       <div className="App">
-        <h1>{this.props.location.state.name}'s Collection</h1>
-        <h3>Museums you've visited</h3>
+        {this.state.name != "" ? <h1>{this.state.name}'s Collection</h1> : <div />}
+        <h3>Favorites</h3>
+        <div className="Art-checkbox-container">
+          { this.renderFavoriteArtworks() }
+          { this.renderFavoriteMuseums() }
+        </div>
+        <h3>Museums visited</h3>
         <div className="Art-checkbox-container">
           { this.renderVisitedMuseums() }
         </div>
-        <h3>Artworks you've seen</h3>
+        <h3>Artworks seen</h3>
         <div className="Art-checkbox-container">
           { this.renderVisitedArtworks() }
         </div>

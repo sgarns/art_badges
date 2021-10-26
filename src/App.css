@@ -15,6 +15,10 @@ a {
   flex-direction: row;
 }
 
+.Art-icon-subtitle {
+  color: grey;
+}
+
 .Art-details {
   display: flex;
   flex-direction: column;

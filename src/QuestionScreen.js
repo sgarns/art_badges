@@ -65,6 +65,7 @@ class QuestionScreen extends React.Component {
       var name = artwork['name'];
       var museum = artwork['museum'];
       var imgUrl = artwork['imgUrl'];
+      var artist = artwork['artist'];
       return (
         <div className="Art-checkbox">
           <input
@@ -79,7 +80,8 @@ class QuestionScreen extends React.Component {
                 <img className="Art-icon-photo" src={imgUrl} alt={name} />
                 <div className="Art-details">
                   <b>{name}</b>
-                  {museum}
+                  {artist}<br />
+                  <div className="Art-icon-subtitle">{museum}</div>
                 </div>
             </div>
           </label>
@@ -110,8 +112,6 @@ class QuestionScreen extends React.Component {
 
   onNameChange(e) {
     const val = e.target.value;
-    console.log("name input");
-    console.log(val);
     this.setState({
       name: val,
     });
@@ -120,12 +120,12 @@ class QuestionScreen extends React.Component {
   // When form is submitted, add to db and go to profile
   async onFormSubmit(e) {
     e.preventDefault();
-    console.log('visited museums', this.state.visitedMuseums);
-    console.log('visited artworks', this.state.visitedArtworks);
     const userId = await this.museumBadgeOps.signIn();
     this.setState({ userId: userId });
 
     this.museumBadgeOps.markVisited(userId, this.state.visitedMuseums, this.state.visitedArtworks);
+    this.museumBadgeOps.saveUserInfo(this.state.name);
+
     this.props.history.push({
       pathname: '/profile/' + userId,
       state: {

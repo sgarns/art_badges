@@ -41,6 +41,22 @@ class MuseumBadgeOps extends React.Component {
     });
   }
 
+  async saveUserInfo(name) {
+    setDoc(doc(db, "userInfo", userId), {
+      name: name,
+    });
+  }
+
+  async getUserInfo() {
+    const querySnapshot = await getDocs(collection(db, "userInfo"), where("uid", "==", userId));
+    var name = ""
+    querySnapshot.forEach((doc) => {
+      name = doc.data()['name'];
+    });
+    console.log(name);
+    return name;
+  }
+
 
   async markVisited(userId, museumsVisited, artworksVisited) {
     var today = new Date();
@@ -126,7 +142,6 @@ class MuseumBadgeOps extends React.Component {
         favorites[name] = {}
       }
     });
-    console.log(favorites);
     return [artworksVisited, favorites];
   }
 
@@ -135,17 +150,74 @@ class MuseumBadgeOps extends React.Component {
       {
         key: "American Gothic",
         museum: "The Art Institute of Chicago",
+        artist: "Grant Wood",
         imgUrl: "https://www.artic.edu/iiif/2/b272df73-a965-ac37-4172-be4e99483637/full/843,/0/default.jpg",
       },
       {
         key: "Mona Lisa",
         museum: "Louvre",
+        artist: "Leonardo da Vinci",
         imgUrl: "https://s.abcnews.com/images/International/mona_lisa_file_getty_190717_hpMain_20190717-061249_4x5_992.jpg",
       },
       {
         key: "Christina's World",
         museum: "MoMA",
+        artist: "Andrew Wyeth",
         imgUrl: "https://www.moma.org/media/W1siZiIsIjE2NTQ1NyJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA5MCAtcmVzaXplIDIwMDB4MTQ0MFx1MDAzZSJdXQ.jpg?sha=87dcd730f5d306a4",
+      },
+      {
+        key: "The Starry Night",
+        museum: "MoMA",
+        artist: "Vincent van Gogh",
+        imgUrl: "https://www.vangoghgallery.com/img/starry_night_full.jpg",
+      },
+      {
+        key: "Guernica",
+        museum: "Museo Nacional Centro de Arte Reina Sofía",
+        artist: "Pablo Picasso",
+        imgUrl: "https://amuraworld.com/images/articles/140-groenlandia/01-full/090-guernica.jpg",
+      },
+      {
+        key: "The Persistence of Memory",
+        museum: "Louvre",
+        artist: "Salvador Dalí",
+        imgUrl: "https://www.moma.org/media/W1siZiIsIjM4NjQ3MCJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA5MCAtcmVzaXplIDIwMDB4MTQ0MFx1MDAzZSJdXQ.jpg?sha=4c0635a9ee70d63e",
+      },
+      {
+        key: "Woman in Gold",
+        museum: "Neue Galerie",
+        artist: "Gustav Klimt",
+        imgUrl: "https://news.artnet.com/app/news-upload/2016/10/3.-Klimt-Portrait-of-Adele-Bloch-Bauer-I-1907.jpg",
+      },
+      {
+        key: "The Birth of Venus",
+        museum: "Uffizi Gallery",
+        artist: "Sandro Botticelli",
+        imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1200px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+      },
+      {
+        key: "The Rape of Proserpina",
+        museum: "Galleria Borghese",
+        artist: "Gian Lorenzo Bernini",
+        imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/The_Rape_of_Proserpina_%28Rome%29.jpg/1200px-The_Rape_of_Proserpina_%28Rome%29.jpg",
+      },
+      {
+        key: "The Night Watch",
+        museum: "Rijksmuseum",
+        artist: "Rembrandt van Rijn",
+        imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/The_Night_Watch_-_HD.jpg/1200px-The_Night_Watch_-_HD.jpg",
+      },
+      {
+        key: "Las Meninas",
+        museum: "Museo del Prado",
+        artist: "Diego Velázquez",
+        imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg/1200px-Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg",
+      },
+      {
+        key: "David",
+        museum: "Galleria dell'Accademia",
+        artist: "Michelangelo",
+        imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/%27David%27_by_Michelangelo_Fir_JBU005_denoised.jpg/1200px-%27David%27_by_Michelangelo_Fir_JBU005_denoised.jpg",
       },
     ];
 
@@ -153,11 +225,13 @@ class MuseumBadgeOps extends React.Component {
       const name = artwork['key'];
       const museum = artwork['museum'];
       const imgUrl = artwork['imgUrl'];
+      const artist = artwork['artist'];
 
       setDoc(doc(db, "artworks", name),{
         name: name,
         museum: museum,
         imgUrl: imgUrl,
+        artist: artist,
       });
     });
   }
@@ -178,6 +252,51 @@ class MuseumBadgeOps extends React.Component {
         key: "The Art Institute of Chicago",
         city: "Chicago, IL",
         imgUrl: "https://media.timeout.com/images/102850781/image.jpg",
+      },
+      {
+        key: "Louvre",
+        city: "Paris, France",
+        imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Louvre_Museum_%2827128035747%29.jpg/1200px-Louvre_Museum_%2827128035747%29.jpg",
+      },
+      {
+        key: "Musée d'Orsay",
+        city: "Paris, France",
+        imgUrl: "https://cdn-imgix-open.headout.com/Orsay/6235-paris-musee-d-orsay-skip-the-line-entry-tickets-01.jpg?auto=compress%2Cformat&fm=pjpg&w=750&q=75&ar=1%3A1.07&fit=crop&crop=faces",
+      },
+      {
+        key: "The Dalí Museum",
+        city: "St. Petersburg, FL",
+        imgUrl: "https://thedali.org/wp-content/uploads/2020/08/1200x500-Dali-Museum-Building-Daytime.jpg",
+      },
+      {
+        key: "Metropolitan Museum of Art",
+        city: "New York, NY",
+        imgUrl: "https://media.timeout.com/images/105666959/image.jpg",
+      },
+      {
+        key: "Van Gogh Museum",
+        city: "Amsterdam, Netherlands",
+        imgUrl: "http://justfunfacts.com/wp-content/uploads/2017/08/van-gogh-museum.jpg",
+      },
+      {
+        key: "Sistine Chapel",
+        city: "Vatican City, Italy",
+        imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sistine_Chapel_ceiling_02.jpg/350px-Sistine_Chapel_ceiling_02.jpg",
+      },
+      {
+        key: "The Broad",
+        city: "Los Angeles, CA",
+        imgUrl: "https://www.thebroad.org/sites/default/files/images/image-thebroad%402x.jpg",
+      },
+      {
+        key: "National Gallery",
+        city: "London, U.K.",
+        imgUrl: "https://www.ceeh.es/wp-content/uploads/2018/03/P3598_005_pr_.jpg",
+      },
+      {
+        key: "National Museum of African American History & Culture",
+        city: "Washington, D.C.",
+        imgUrl: "https://civilrightstrail.com/app/uploads/2017/10/DC_Washington_AAHCMuseum2.jpg",
       },
     ];
 
