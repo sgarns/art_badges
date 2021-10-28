@@ -19,12 +19,6 @@ a {
   color: grey;
 }
 
-.Art-details {
-  display: flex;
-  flex-direction: column;
-  padding-left: 8px;
-}
-
 .Art-checkbox-container {
   display: flex;
   flex-wrap: wrap;
@@ -32,10 +26,23 @@ a {
 
 .Art-checkbox {
   margin-right: 32px;
+  margin-bottom: 16px;
   padding: 16px;
-  width: 25%;
-  /* outline-style: solid;
-  outline-width: 1px; */
+  flex-shrink: 0;
+  border-style: solid;
+  border-color: LightGrey;
+  border-width: thin;
+  border-radius: 25px;
+}
+
+.Art-details {
+  display: flex;
+  flex-direction: column;
+  padding-left: 8px;
+}
+
+.Art-details-subtitle {
+  color: grey;
 }
 
 .Museum-name {
@@ -50,6 +57,46 @@ a {
   object-fit: cover;
   border-radius: 50%;
   padding-bottom: 6px;
+}
+
+.Event-card {
+  padding-top: 8px;
+  margin: 16px;
+}
+
+/* .Event-card {
+  width: 18rem;
+  padding: 16px;
+  margin: 8px;
+  border-style: solid;
+  border-color: LightGrey;
+  border-width: thin;
+  border-radius: 25px;
+} */
+
+.Event-card-image {
+  width: 18rem;
+  height: 10rem;
+  object-fit: cover;
+  padding-bottom: 8px;
+}
+
+.Event-title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.Event-subtitle {
+  color: grey;
+}
+
+.Events-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.icon {
+  padding-bottom: 8px;
 }
 
 .Museum-visited-icon {

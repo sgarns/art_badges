@@ -57,23 +57,6 @@ class MuseumBadgeOps extends React.Component {
     return name;
   }
 
-
-  async markVisited(userId, museumsVisited, artworksVisited) {
-    var today = new Date();
-    setDoc(doc(db, "museumsVisited", userId), {
-      timestamp: today,
-      uid: userId,
-      museumsVisited: museumsVisited,
-      favorites: [],
-    });
-    setDoc(doc(db, "artworksVisited", userId), {
-      timestamp: today,
-      uid: userId,
-      artworksVisited: artworksVisited,
-      favorites: [],
-    });
-  }
-
   async markFavorite(userId, name, isFavorite, isMuseum) {
     var currDoc = {};
     if (isMuseum) {
@@ -89,6 +72,39 @@ class MuseumBadgeOps extends React.Component {
     } else {
       updateDoc(currDoc, {
         favorites: arrayRemove(name)
+      });
+    }
+  }
+
+  async markVisited(userId, museumsVisited, artworksVisited) {
+    var today = new Date();
+    setDoc(doc(db, "wantToVisit", userId), {
+      uid: userId,
+      eventIds: [],
+    });
+    setDoc(doc(db, "museumsVisited", userId), {
+      timestamp: today,
+      uid: userId,
+      museumsVisited: museumsVisited,
+      favorites: [],
+    });
+    setDoc(doc(db, "artworksVisited", userId), {
+      timestamp: today,
+      uid: userId,
+      artworksVisited: artworksVisited,
+      favorites: [],
+    });
+  }
+
+  async markWantToVisit(userId, eventId, toRemove) {
+    var currDoc = doc(db, "wantToVisit", userId);
+    if (toRemove) {
+      updateDoc(currDoc, {
+        eventIds: arrayRemove(eventId)
+      });
+    } else {
+      updateDoc(currDoc, {
+        eventIds: arrayUnion(eventId)
       });
     }
   }
@@ -115,21 +131,6 @@ class MuseumBadgeOps extends React.Component {
     return allMuseums;
   }
 
-  async getMuseumsVisited(userId) {
-    const q = query(collection(db, "museumsVisited"), where("uid", "==", userId));
-
-    const querySnapshot = await getDocs(q);
-    var museumsVisited = [];
-    var favorites = {};
-    querySnapshot.forEach((doc) => {
-      museumsVisited = Object.keys(doc.data().museumsVisited);
-      for (let name of doc.data()['favorites']) {
-        favorites[name] = {}
-      }
-    });
-    return [museumsVisited, favorites];
-  }
-
   async getArtworksVisited(userId) {
     const q = query(collection(db, "artworksVisited"), where("uid", "==", userId));
 
@@ -143,6 +144,35 @@ class MuseumBadgeOps extends React.Component {
       }
     });
     return [artworksVisited, favorites];
+  }
+
+  async getMuseumsVisited(userId) {
+    const q = query(collection(db, "museumsVisited"), where("uid", "==", userId));
+
+    const querySnapshot = await getDocs(q);
+    var museumsVisited = [];
+    var favorites = {};
+    querySnapshot.forEach((doc) => {
+      museumsVisited = Object.keys(doc.data().museumsVisited);
+      for (let name of doc.data()['favorites']) {
+        favorites[name] = {};
+      }
+    });
+    return [museumsVisited, favorites];
+  }
+
+  async getWantToVisit(userId) {
+    const q = query(collection(db, "wantToVisit"), where("uid", "==", userId));
+
+    const querySnapshot = await getDocs(q);
+    var wantToVisit = {};
+    querySnapshot.forEach((doc) => {
+      for (let id of doc.data()['eventIds']) {
+        wantToVisit[id] = {};
+      }
+    });
+
+    return wantToVisit;
   }
 
   async addArtworkstoDb(artworks) {
@@ -179,7 +209,7 @@ class MuseumBadgeOps extends React.Component {
       },
       {
         key: "The Persistence of Memory",
-        museum: "Louvre",
+        museum: "MoMA",
         artist: "Salvador Dalí",
         imgUrl: "https://www.moma.org/media/W1siZiIsIjM4NjQ3MCJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA5MCAtcmVzaXplIDIwMDB4MTQ0MFx1MDAzZSJdXQ.jpg?sha=4c0635a9ee70d63e",
       },

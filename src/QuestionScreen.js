@@ -87,7 +87,7 @@ class QuestionScreen extends React.Component {
           </label>
         </div>
       )
-    })
+    });
   }
 
   // On click of museum checkbox, update state
@@ -148,16 +148,16 @@ class QuestionScreen extends React.Component {
                 id="name"
                 onChange={this.onNameChange.bind(this)}
                 value={this.state.name}
-              />
+              /><br /><br />
               <h3>Which museums have you visited?</h3>
               <div className="Art-checkbox-container">
                 { this.renderVisitedMuseums() }
-              </div>
+              </div><br /><br />
               <h3>What artworks have you seen?</h3>
               <div className="Art-checkbox-container">
                 { this.renderVisitedArtworks() }
-              </div>
-              <br /><input className="Submit-button" type="submit" value="Save"/>
+              </div><br />
+              <input className="Submit-button" type="submit" value="Save"/>
             </form>
           </div>
       </div>
